@@ -9,7 +9,6 @@ from kafka.errors import KafkaError
 from kafka.admin import KafkaAdminClient, NewTopic
 import logging
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Function to ensure topic exists
@@ -110,6 +109,14 @@ def main():
     dlt_topic = os.environ.get("DLT_TOPIC", "appointment_dlt")  # Dead-letter topic
 
     if not all([bootstrap_servers, sasl_plain_username, sasl_plain_password, output_topic]):
+        if not bootstrap_servers:
+            logging.error("BOOTSTRAP_SERVERS environment variable is not set.")
+        if not sasl_plain_username:
+            logging.error("SASL_USERNAME environment variable is not set.")
+        if not sasl_plain_password:
+            logging.error("SASL_PASSWORD environment variable is not set.")     
+        if not output_topic:
+            logging.error("OUTPUT_TOPIC environment variable is not set.")  
         logging.error("Missing required environment variables. Please set BOOTSTRAP_SERVERS, SASL_USERNAME, SASL_PASSWORD, and OUTPUT_TOPIC.")
         return
 
