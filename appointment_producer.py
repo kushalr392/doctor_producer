@@ -33,11 +33,24 @@ def ensure_topic_exists(bootstrap_servers, topic_name, security_protocol, sasl_m
             admin_client.close()
 
 
+# Pre-generate 5 doctors from different departments
+DEPARTMENTS = ["Cardiology", "Neurology", "Orthopedics", "Oncology", "Pediatrics"]
+DOCTORS = []
+for dept in DEPARTMENTS:
+    DOCTORS.append({
+        "doctor_id": str(uuid.uuid4()),
+        "name": f"Dr. {uuid.uuid4().hex[:8]}",
+        "department": dept
+    })
+
+
 
 def generate_appointment_data(event_type):
     now = datetime.now()
     patient_id = str(uuid.uuid4())
     appointment_id = str(uuid.uuid4())
+    # randomly select a pre-generated doctor
+    doctor = random.choice(DOCTORS)
 
     if event_type == "appointment_created":
         appointment_time = now + timedelta(days=random.randint(1, 30))
@@ -45,9 +58,10 @@ def generate_appointment_data(event_type):
             "event_type": "appointment_created",
             "appointment_id": appointment_id,
             "patient_id": patient_id,
-            "doctor_id": str(uuid.uuid4()),
+            "doctor_id": doctor["doctor_id"],
+            "doctor_name": doctor["name"],
             "scheduled_time": appointment_time.isoformat(),
-            "department": random.choice(["Cardiology", "Neurology", "Orthopedics", "Oncology"]),
+            "department": doctor["department"],
             "reason": "Regular checkup",
             "status": "scheduled"
         }
